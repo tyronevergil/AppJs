@@ -1,0 +1,10 @@
+﻿@{
+    if (Context.Request.Query["h"] == "off")
+    {
+        Layout = "~/Views/Shared/_LayoutDefault.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_LayoutHome.cshtml";
+    }
+}

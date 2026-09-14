@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.Partial("_Menu")
+<div class="container body-content page-content">
+    @RenderBody()
+</div>
+@Html.Partial("_QuoteOfTheDay")
+<div class="container page-footer">
+    <hr />
+    <footer>
+        <p>&copy; 2016 AppJs Framework<span class="clock"></span></p>
+    </footer>
+</div>

@@ -1,0 +1,79 @@
+﻿[app-button='primary'].ui-button, [app-button='success'].ui-button, [app-button='info'].ui-button, [app-button='warning'].ui-button, [app-button='danger'].ui-button {
+    color: #fff;
+    background-image: none !important;
+}
+
+[app-button].ui-state-focus  {
+  outline: thin dotted #333;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+[app-button].ui-state-active  {
+    outline: 0;
+}
+
+[app-button='primary'].ui-state-default {
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+[app-button='primary'].ui-state-hover {
+    background-color: #2e6da4;
+}
+
+[app-button='primary'].ui-state-active {
+    background-color: #337ab7;
+}
+
+[app-button='success'].ui-state-default {
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+
+[app-button='success'].ui-state-hover {
+    background-color: #4cae4c;
+}
+
+[app-button='success'].ui-state-active {
+    background-color: #5cb85c;
+}
+
+[app-button='info'].ui-state-default {
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+
+[app-button='info'].ui-state-hover {
+    background-color: #46b8da;
+}
+
+[app-button='info'].ui-state-active {
+    background-color: #5bc0de;
+}
+
+[app-button='warning'].ui-state-default {
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+
+[app-button='warning'].ui-state-hover {
+    background-color: #eea236;
+}
+
+[app-button='warning'].ui-state-active {
+    background-color: #f0ad4e;
+}
+
+[app-button='danger'].ui-state-default {
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+[app-button='danger'].ui-state-hover {
+    background-color: #d43f3a;
+}
+
+[app-button='danger'].ui-state-active {
+    background-color: #d9534f;
+}

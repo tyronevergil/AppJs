@@ -1,0 +1,5 @@
+﻿@import "themes/base/all.css";
+@import "kendo/2015.3.1111/kendo.common.core.min.css";
+@import "kendo/2015.3.1111/kendo.bootstrap.min.css";
+@import "../Scripts/qTip/jquery.qtip.min.css";
+@import "ui/all.css";
