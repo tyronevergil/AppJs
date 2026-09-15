@@ -10,7 +10,7 @@
 
         self.submitContactMe = function (data, fn) {
             $.ajax({
-                url: "https://formsubmit.co/ajax/tyrone.roson+appjs@hotmail.com",
+                url: "https://formsubmit.co/ajax/2d08e1f299cf9579214b28e008ad80c1",
                 method: "POST",
                 dataType: "json",
                 data: {
