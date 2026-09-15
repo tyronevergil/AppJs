@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--[if lt IE 9]>      <html class="lt-ie11 lt-ie10 lt-ie9 no-js"> <![endif]-->
+<!--[if IE 9]>         <html class="lt-ie11 lt-ie10 no-js"> <![endif]-->
+<!--[if IE 10]>        <html class="lt-ie11 no-js"> <![endif]-->
+<!--[if gt IE 10]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo - AppJs Framework</title>
+  <link rel="stylesheet" href="Content/Site.css" />
+  <link rel="stylesheet" href="Content/bootstrap.min.css" />
+  <link rel="stylesheet" href="Content/app.css" />
+  <link rel="stylesheet" href="Content/widgets.css" />
+  <script src="Scripts/modernizr-2.6.2.js"></script>
+  <script src="App/app.init.js"></script>
+</head>
+<body>
+  <div class="loader" style="position:fixed"><span class="loader-text" unselectable="on">Please wait...</span></div>
+  <div class="not-supported" style="position:fixed"><span class="not-supported-text" unselectable="on">Your browser, your browser is not supported. To work properly, this page requires IE9 or above.</span></div>
+  <div class="no-script" style="position:fixed"><span class="no-script-text" unselectable="on">Your browser, either you have javascript disabled or your browser does not support javascript. To work properly, this page requires javascript to be enabled.</span></div>
+  <div class="page">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header"><a app-navigate href="index.html" class="navbar-brand">AppJs Framework</a></div>
+        <div class="navbar-collapse collapse"><ul class="nav navbar-nav"><li><a app-modal href="contact.html">Contact Me</a></li></ul></div>
+      </div>
+    </nav>    
+    <div app-partial="demo.html" class="container body-content page-content"></div>
+    <div app-controller="location: 'QuoteOfTheDay', mvvm: false" class="container" style="margin-bottom: -20px;">
+      <p><i><span data-bind="text: Quote"></span><span>&nbsp;&nbsp;-&nbsp;</span><span data-bind="text: Author"></span></i></p>
+    </div>    
+    <div class="container page-footer"><hr /><footer><p>&copy; 2016 AppJs Framework<span class="clock"></span></p></footer></div>
+  </div>
+  <script src="Scripts/require.js"></script>
+  <script src="App/app.config.js"></script>
+  <script src="App_Modules/modules.config.js"></script>
+  <script src="App_Widgets/widgets.config.js"></script>
+  <script src="App/app.js"></script>
+</body>
+</html>

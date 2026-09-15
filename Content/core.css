@@ -1,0 +1,45 @@
+﻿@import "loader.css";
+@import "modal.css";
+@import "notsupported.css";
+@import "noscript.css";
+
+body {
+    padding-bottom: 60px !important;
+}
+
+label {
+    margin-right: 7px;
+}
+
+.noheader body {
+    padding-top: 0px;
+}
+
+.noheader nav {
+    display: none;
+}
+
+.page {
+    height: 100%;
+}
+
+.container.page-content {
+    min-height: 100%;
+}
+
+.container.page-footer hr {
+    margin-bottom: 10px !important;
+}
+
+.clock {
+    float: right
+}
+
+.lt-ie9 .page, .no-js .page {
+    display: none;
+}
+
+[app-open], [app-navigate], [app-modal]
+{
+    cursor: pointer;
+}

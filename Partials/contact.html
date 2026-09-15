@@ -1,0 +1,20 @@
+<div app-controller="ContactMe">
+    <script type="application/json">{"model":{"Name":"","Email":"","Message":""}}</script>
+    <h3>Contact Me</h3>
+    <div data-bind="css: { 'has-error': Errors.Name }">
+        <label>Name:</label><input type="text" data-bind="value: Name" /><br />
+        <span class="help-block" data-bind="text: Errors.Name, visible: Errors.Name"></span>
+    </div>
+    <div data-bind="css: { 'has-error': Errors.Email }">
+        <label>Email:</label><input type="email" data-bind="value: Email" /><br />
+        <span class="help-block" data-bind="text: Errors.Email, visible: Errors.Email"></span>
+    </div>
+    <div data-bind="css: { 'has-error': Errors.Message }">
+        <label>Message:</label><br /><textarea data-bind="value: Message"></textarea><br />
+        <span class="help-block" data-bind="text: Errors.Message, visible: Errors.Message"></span>
+    </div>
+    <br />
+    <p><strong data-bind="text: Response"></strong></p>
+    <button type="button" app-button="success" app-tooltip="Send your message" data-bind="click: Submit">Submit</button>
+    <button type="button" app-button="danger" style="display:none" data-bind="click: Close, visible: CloseButtonVisible">Close</button>
+</div>

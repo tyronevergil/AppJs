@@ -1,0 +1,190 @@
+﻿<h3>From JavaScript Tools to a Cohesive Framework</h3>
+<p><strong>How AppJs organizes existing JavaScript implementations into a shared application structure</strong></p><br />
+
+<h4>Introduction: From Existing Tools to a Shared Structure</h4>
+
+<p>This article begins with a maintenance problem rather than a new-application design. The system already depended on several JavaScript tools, and some of those tools were tied to particular library versions. The response was to introduce a small framework layer and shape it around the existing implementation, allowing those tools to continue working while bringing them under a more consistent application structure.</p>
+
+<p>For example, an older modal implementation may require an older jQuery version, while newer widgets can use a later version. AppJs delegates to those existing implementations through defined boundaries instead of forcing every tool into the same version or API. The framework provides the common structure around them: module loading, declarative attributes, widget registration, data binding, and feature initialization.</p>
+
+<p>The design question is therefore: <strong>how can a collection of JavaScript tools evolve into a cohesive framework without discarding the implementations that already work?</strong> The examples that follow move from interchangeable UI controls and MVVM to a lightweight controller pattern, then examine the small declarative helpers, graceful degradation, and module wiring that support those features.</p>
+
+<br />
+<h4>Section 1: Interchangeable UI Controls</h4>
+<p>A widget-specific binding couples the view to the library that implements it. If a binding is tied to jQuery UI, switching to Kendo UI requires changing the affected bindings and initialization assumptions. AppJs separates the date value and its validation from the widget implementation, allowing an adapter to connect the same view to the selected datepicker library.</p>
+<p>Before adding a widget adapter, the feature can work with a plain text input and a Knockout view model responsible for the value, formatting, and validation:</p>
+<pre>
+<code>
+    &lt;label&gt;Date:&lt;/label&gt;
+    &lt;input type="text" <em>data-bind</em>="value: Date" /&gt;
+    &lt;p data-bind="text: Message"&gt;&lt;/p&gt;
+    &lt;button data-bind="click: Validate"&gt;Validate&lt;/button&gt;
+    &lt;script&gt;
+        $(function() {
+            var viewModel = function () {
+                var DATE_FORMAT = "DD/MM/YYYY";
+                this.Date = ko.observable("");
+                this.Message = ko.observable("");
+                this.Validate = function() {
+                    var val = this.Date();
+                    var d = moment(val, DATE_FORMAT);
+                    if (d.isValid()) {
+                        var formattedVal = d.format(DATE_FORMAT);
+                        this.Message("Given date is valid. " + formattedVal);
+                    }
+                    else {
+                        this.Message("Invalid date. " + val);
+                    }
+                };
+            };
+            ko.applyBindings(new viewModel());
+        });
+    &lt;/script&gt;
+</code>
+</pre>
+<p>By using a neutral <code>app-datepicker</code> attribute, AppJs decouples the widget choice from the markup:</p>
+<pre>
+<code>
+    &lt;label&gt;Date:&lt;/label&gt;
+    &lt;input type="text" data-bind="value: Date" <em>app-datepicker</em>="format: 'DD/MM/YYYY', displayFormat: 'DD.MM.YYYY'" /&gt;
+</code>
+</pre>
+
+<p>The same markup and view model can be used with the jQuery UI and Kendo UI adapters provided by AppJs. Other widget libraries could follow the same pattern by supplying an adapter that implements the AppJs widget structure. Each adapter remains responsible for translating the neutral <code>app-datepicker</code> declaration into its library-specific configuration and event behavior.</p>
+
+<p>This progression illustrates <strong>progressive enhancement</strong>: the same plain text input provides the basic interaction first, then can be enhanced with either a jQuery UI or Kendo UI datepicker through an adapter, without changing the view model or the surrounding application logic.</p>
+
+<ul>
+    <li><strong>Demo 1</strong> (Plain MVVM): <a app-open="height: 400, width: 500, nocascade: true" href="demo.html?h=off&widgets=off">Baseline without widgets</a> — view model and KnockoutJS data binding only</li>
+    <li><strong>Demo 2</strong> (jQuery UI): <a app-open="height: 400, width: 500, nocascade: true" href="demo.html?h=off">jQuery UI adapter</a> — same markup, same view model, jQuery UI datepicker active</li>
+    <li><strong>Demo 3</strong> (Kendo UI): <a app-open="height: 400, width: 500, nocascade: true" href="demo.html?h=off&widgets=2">Kendo UI adapter</a> — same markup, same view model, Kendo UI datepicker active</li>
+</ul>
+
+<br />
+<h4>Section 2: The MVVM Pattern</h4>
+<p>For features with form state, asynchronous actions, and UI feedback, AppJs uses an MVVM workflow. The important part is not only that the page uses KnockoutJS. It is that each responsibility has a place, which makes the feature easier to change without spreading new logic into legacy markup or global scripts.</p>
+
+<p>The Contact Form is assembled from four small modules:</p>
+
+<ul>
+    <li><strong>provider.js</strong>: Supplies the data the feature needs and keeps that data source separate from the view. In the Contact Form, it provides the initial model directly. Other features can define their own provider contract when their data needs are different.</li>
+    <li><strong>bindingModel.js</strong>: Holds the testable feature logic and depends on both <code>provider.js</code> for data and <code>commands.js</code> for operations. It converts provider data into Knockout observables, serializes the current state, submits it through the command, and publishes the response.</li>
+    <li><strong>commands.js</strong>: Defines the operations the feature can perform. In this example, it handles the Contact Form submission action and translates the result from the configured service into a small response understood by the binding model.</li>
+    <li><strong>viewModel.js</strong>: Builds on <code>bindingModel.js</code> with UI actions such as <code>Submit</code> and <code>Close</code>, and manages concerns such as showing the loader while submission is in progress.</li>
+</ul>
+
+<p>These modules are composed behind the view, which only declares its fields and bindings:</p>
+<pre>
+<code>
+    &lt;input type="text" data-bind="value: Name" /&gt;
+    &lt;input type="text" data-bind="value: Email" /&gt;
+    &lt;textarea data-bind="value: Message"&gt;&lt;/textarea&gt;
+    &lt;button data-bind="click: Submit"&gt;Submit&lt;/button&gt;
+</code>
+</pre>
+
+<p>At runtime, the <a app-modal href="contact.html">Contact Form</a> receives its initial data, exposes it as observable state, and submits the current values through the feature's submission action. The view only declares the fields and bindings; it does not know which service handles the submission. That implementation detail remains behind the feature boundary and can change without changing the view.</p>
+
+<h5>Unit Testing the Feature Logic</h5>
+<p>The separation makes the binding model independently testable. The test replaces the data source and submission operation with in-memory stubs, then verifies that the command response is published through <code>Response</code>. It does not involve the DOM, an external service, or <code>viewModel.js</code>.</p>
+<p>In behavioral terms, the scenario is simple: given a binding model containing form data, when the submission command returns a successful response, the binding model exposes that response through <code>Response</code>. The following representative <a app-open href="https://qunitjs.com/">QUnit</a> test expresses that behavior directly:</p>
+<pre>
+<code>
+    var stubProvider = {
+        getBindingModel: function () {
+            return { Name: "", Email: "", Message: "" };
+        }
+    };
+
+    var stubCommands = {
+        submitContactMe: function (data, callback) {
+            callback({ IsSuccess: true, Message: "Thank you!" });
+        }
+    };
+
+    QUnit.test("submit publishes the command response", function (assert) {
+        var model = contactBindingModel(stubProvider, stubCommands);
+        model.Name("Bert");
+
+        model.DoSubmit(function () {
+            assert.equal(model.Response(), "Thank you!");
+        });
+    });
+</code>
+</pre>
+<p>The assertion demonstrates the binding model's responsibility: it receives the command result and publishes the returned message through <code>Response</code>.</p>
+<p>Use MVVM when:</p>
+<ul>
+    <li>Your feature has complex state management</li>
+    <li>You need two-way data binding</li>
+    <li>The logic should be unit-testable independently</li>
+</ul>
+
+<br />
+<h4>Section 3: The Controller Pattern</h4>
+<p>MVVM provides useful separation when a feature has several kinds of state and interaction. For a small feature with one focused responsibility, that structure can add more ceremony than the feature needs. AppJs also supports a <strong>controller.js</strong> pattern for these cases. This is not a competing architecture; it is a smaller boundary for a feature whose responsibilities are easier to keep together.</p>
+
+<p>Controllers are lightweight modules that manage a single concern directly. For example, the Quote of the Day controller displays a randomly selected quote above the footer:</p>
+
+<ul>
+    <li>Fetches data from an external API (<code>dummyjson.com/quotes/random</code>)</li>
+    <li>Applies KnockoutJS bindings directly in the controller function</li>
+</ul>
+
+<p>This controller has a smaller flow: fetch, bind, and display. It can be added to an existing page without introducing additional feature layers, because its responsibilities remain focused in one place.</p>
+
+<p>Use a controller when:</p>
+<ul>
+    <li>Your feature is self-contained with limited interaction state</li>
+    <li>You just need to display data with minimal logic</li>
+    <li>The feature does not need the full MVVM structure</li>
+</ul>
+
+<br />
+<h4>Section 4: Small Declarative Helpers</h4>
+<p>These helpers provide small pieces of presentation behavior without changing the feature architecture. Tooltips can be attached declaratively to a control and initialized through the widget system. <code>app-modal</code> presents a target through the framework's modal integration when the environment supports that interaction, while <code>app-open</code> presents a target in a separate browser window when popups are allowed. Both helpers fall back to normal navigation when those enhanced behaviors are unavailable. They remain presentation conveniences around a feature and do not change its provider, binding model, command, or controller pattern.</p>
+
+<br />
+<h4>Section 5: Graceful Degradation</h4>
+<p>Unlike the datepicker examples, which add richer behavior through supported adapters, the placeholder fallback module provides compatibility behavior when native browser support is missing. This is <strong>graceful degradation</strong>: when feature detection identifies that native <code>placeholder</code> behavior is unavailable, the module supplies an acceptable fallback while the input remains usable. The datepicker adapters select supported widget implementations without changing the date-demo view model; the placeholder module fills a browser capability gap.</p>
+
+<br />
+<h4>Section 6: Module Loading and Widget Registration</h4>
+<p>AppJs wires these features together behind the scenes through <a app-open href="https://requirejs.org/">RequireJS</a>. Feature modules declare their behavior, while the framework loads the configured dependencies and applies the selected widget implementations to the relevant DOM node. This keeps library-specific initialization out of the view. The same idea can be implemented with another module loader or registration system; the important part is the shared rendering contract between the framework and each widget.</p>
+<p>The following simplified example illustrates that contract: the framework loads the selected widget modules and invokes their shared <code>render</code> method for a target container:</p>
+<pre>
+<code>
+    define(['module', 'require'], function (module, require) {
+        var widgets = module.config().registration();
+
+        return {
+            render: function (container) {
+                require(widgets, function () {
+                    for (var i = 0, widget; widget = arguments[i]; i++) {
+                        if (widget && widget.render) {
+                            widget.render(container);
+                        }
+                    }
+                });
+            }
+        };
+    });
+</code>
+</pre>
+
+<br />
+<h4>Conclusion: Managing Legacy Complexity</h4>
+<p>AppJs is an example of how a collection of JavaScript tools can evolve into a cohesive application structure. It does not eliminate the differences between those tools; it gives them common boundaries, loading rules, and lifecycle behavior.</p>
+
+<p>The ideas are intentionally adaptable:</p>
+<ul>
+    <li>UI adapters separate widget choices from feature logic.</li>
+    <li>MVVM gives stateful features a structured and testable workflow.</li>
+    <li>Controllers keep focused features small.</li>
+    <li>Declarative helpers and graceful-degradation modules improve the interface without changing feature architecture.</li>
+    <li>Module wiring allows the underlying tools to participate in a shared application lifecycle.</li>
+    <li>Incremental evolution allows components to be modernized at different times while stable implementations continue to participate in the same application structure.</li>
+</ul>
+
+<p>In this article, <strong>AppJs</strong> is simply the short, generic name used for this application JavaScript framework. It does not refer to other projects that use the same name. The examples are not intended to prescribe one implementation or document every part of the framework. They present a set of architectural ideas that can be adapted to different libraries, module loaders, testing tools, and application structures.</p>
+<br /><br />
