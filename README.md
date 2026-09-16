@@ -1,5 +1,7 @@
 # AppJs Framework
 
+[Read the article](https://tyronevergil.github.io/AppJs)
+
 AppJs is a small framework layer built around existing JavaScript tools rather than a ground-up rewrite. It grew out of a maintenance problem: a system already depended on several JavaScript libraries, some tied to specific versions, and the goal was to bring them under a consistent application structure without discarding what already worked.
 
 Key ideas:
